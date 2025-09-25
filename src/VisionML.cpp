@@ -193,15 +193,36 @@ visp::image_data VisionModels::predictSegmentationMask(visp::box_2d box)
     return visp::sam_compute(m_sam, box);
 }
 
-visp::image_data VisionModels::removeBackground(visp::image_view const &image)
+visp::image_data VisionModels::removeBackground(visp::image_view const &originalImage)
 {
     QMutexLocker lock(&m_mutex);
     if (!m_birefnet.weights) {
         QByteArray path = modelPath(VisionMLTask::background_removal);
         m_birefnet = visp::birefnet_load_model(path.data(), m_backend);
     }
+    visp::image_data resized;
+    visp::image_view image = originalImage;
+    if (m_birefnet.params.image_size == -1) {
+        int maxSide = std::max(image.extent[0], image.extent[1]);
+        // BiRefNet-dynamic is trained on images up to 2304px resolution
+        // using larger images doesn't make much sense and takes very long.
+        // CPU-only because GPU already has built-in resize to stay below allocation limits.
+        if (maxSide > 2304 && m_backendType == visp::backend_type::cpu) {
+            float f = 2304.f / float(maxSide);
+            auto target = visp::i32x2{int(image.extent[0] * f), int(image.extent[1] * f)};
+            int m = m_birefnet.params.image_multiple;
+            target[0] = (target[0] + m - 1) / m * m;
+            target[1] = (target[1] + m - 1) / m * m;
+            resized = visp::image_scale(image, target);
+            image = resized;
+        }
+    }
     auto result = visp::birefnet_compute(m_birefnet, image);
     unloadFromGPU(m_birefnet.graph, m_backendType);
+
+    if (resized.data) {
+        result = visp::image_scale(result, originalImage.extent);
+    }
     return result;
 }
 
