@@ -1,15 +1,19 @@
 #include "BackgroundRemovalFilter.h"
 
 #include "KisGlobalResourcesInterface.h"
+#include "KoCompositeOpRegistry.h"
 #include "KoUpdater.h"
 #include "kis_config_widget.h"
+#include "kis_fill_painter.h"
 #include "kis_filter_category_ids.h"
 #include "kis_paint_device.h"
+#include "kis_painter.h"
+#include "kis_selection.h"
 
+#include <QCheckBox>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QVBoxLayout>
-#include <QCheckBox>
 
 //
 // Configuration widget
@@ -150,21 +154,27 @@ void BackgroundRemovalFilter::processImpl(KisPaintDeviceSP device,
         if (progressUpdater)
             progressUpdater->setProgress(90);
 
-        QImage resultImage;
         if (estimateForeground) {
+            const KoColorSpace *originalCS = device->colorSpace();
+            const KoColorSpace *rgba32 = KoColorSpaceRegistry::instance()->colorSpace("RGBA", "F32", "");
+            device->convertTo(rgba32);
             visp::image_data maskF32 = visp::image_u8_to_f32(mask, visp::image_format::alpha_f32);
-            visp::image_data imageF32 = visp::image_u8_to_f32(image.view, visp::image_format::rgba_f32);
-            visp::image_data fgF32 = visp::image_estimate_foreground(imageF32, maskF32);
-            visp::image_data fg = visp::image_f32_to_u8(fgF32, visp::image_format::rgba_u8);
-            resultImage = VisionMLImage::convertToQImage(fg);
+            visp::image_data imageF32 = visp::image_alloc(mask.extent, visp::image_format::rgba_f32);
+            device->readBytes(imageF32.data.get(), applyRect);
+            visp::image_data foreground = visp::image_estimate_foreground(imageF32, maskF32);
+            device->writeBytes(foreground.data.get(), applyRect);
+            device->convertTo(originalCS);
         } else {
-            visp::image_set_alpha(image.view, mask);
-            resultImage = image.data;
+            KisSelectionSP selection = KisSelectionSP(new KisSelection());
+            selection->pixelSelection()->writeBytes(mask.data.get(), applyRect);
+            selection->pixelSelection()->invert();
+            KisFillPainter painter(device, selection);
+            painter.setCompositeOpId(COMPOSITE_ERASE);
+            painter.fillSelection(applyRect, KoColor(QColor(0, 0, 0, 255), device->colorSpace()));
+            painter.end();
         }
         if (progressUpdater)
             progressUpdater->setProgress(99);
-
-        device->convertFromQImage(resultImage, nullptr, applyRect.x(), applyRect.y());
 
     } catch (const std::exception &e) {
         Q_EMIT m_report.errorOccurred(QString(e.what()));

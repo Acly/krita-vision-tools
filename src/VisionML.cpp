@@ -346,16 +346,15 @@ VisionMLImage VisionMLImage::prepare(KisPaintDevice const &device, QRect bounds)
     if (cs->pixelSize() == 4 && cs->id() == "RGBA") {
         // Stored as BGRA, 8 bits per channel in Krita. No conversions for now, the segmentation network expects
         // gamma-compressed sRGB, but works fine with other color spaces (probably).
-        result.view.format = visp::image_format::bgra_u8;
         result.data = QImage(bounds.width(), bounds.height(), QImage::Format_ARGB32);
-        device.readBytes(result.data.bits(), bounds.x(), bounds.y(), bounds.width(), bounds.height());
+        device.readBytes(result.data.bits(), bounds);
     } else {
         // Convert everything else to QImage::Format_ARGB32 in default color space (sRGB).
-        result.view.format = visp::image_format::argb_u8;
         result.data = device.convertToQImage(nullptr, bounds);
     }
     result.view.extent = {result.data.width(), result.data.height()};
     result.view.stride = result.data.bytesPerLine();
+    result.view.format = visp::image_format::bgra_u8; // QImage::Format_ARGB32 is BGRA in little endian byte order
     result.view.data = result.data.bits();
     return result;
 }
