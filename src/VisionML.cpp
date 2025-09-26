@@ -130,6 +130,10 @@ VisionModels::VisionModels()
 
     QString err = initialize(backendType);
     if (!err.isEmpty()) {
+        backendType = backendType == visp::backend_type::gpu ? visp::backend_type::cpu : visp::backend_type::gpu;
+        err = initialize(backendType);
+    }
+    if (!err.isEmpty()) {
         QMessageBox::warning(nullptr,
                              i18nc("@title:window", "Krita - VisionML Plugin"),
                              i18n("Failed to initialize AI tools plugin.\n") + err);
