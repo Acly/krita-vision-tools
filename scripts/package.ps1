@@ -16,6 +16,7 @@ if ([string]::IsNullOrEmpty($Version)) {
 
 $TempDir = New-TemporaryFile | ForEach-Object { Remove-Item $_; New-Item -ItemType Directory -Path $_ }
 $LargeFiles = @()
+$OriginalLocation = Get-Location
 
 Set-Location $Folder
 
@@ -32,7 +33,7 @@ foreach ($file in $LargeFiles) {
 
 # Zip the folder contents
 $ZipName = "krita_vision_tools-windows-x64-$Version.zip"
-Compress-Archive -Path ".\*" -DestinationPath $ZipName -CompressionLevel Optimal
+& 7z a -tzip $ZipName ".\*" | Out-Null
 
 # Restore large files
 foreach ($file in $LargeFiles) {
@@ -48,3 +49,5 @@ Move-Item -Path $ZipName -Destination $HomeZipPath
 Remove-Item -Path $TempDir.FullName -Recurse -Force
 
 Write-Host "Packaging complete. Zip file moved to $HomeZipPath"
+
+Set-Location $OriginalLocation
