@@ -37,7 +37,7 @@ You can find it at Filters › Other › Background Removal...
 
 ## Installation
 
-The current version of the plugin is built for [Krita 5.2.11](https://krita.org/en/download/krita-desktop/).
+The current version of the plugin is built for [Krita 5.2.13](https://krita.org/en/download/).
 Using it with other versions may lead to crashes.
 
 You can download the latest version of the plugin from the [releases page](https://github.com/Acly/krita-ai-tools/releases).
