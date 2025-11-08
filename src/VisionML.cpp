@@ -399,6 +399,10 @@ VisionMLBackendWidget::VisionMLBackendWidget(QSharedPointer<VisionModels> shared
     KisOptionButtonStrip *strip = new KisOptionButtonStrip;
     m_cpuButton = strip->addButton(i18n("CPU"));
     m_gpuButton = strip->addButton(i18n("GPU"));
+    if (!visp::backend_is_available(visp::backend_type::cpu)) {
+        m_cpuButton->setEnabled(false);
+        m_cpuButton->setToolTip(i18n("CPU backend not available, hardware is not supported"));
+    }
     if (!visp::backend_is_available(visp::backend_type::gpu)) {
         m_gpuButton->setEnabled(false);
         m_gpuButton->setToolTip(i18n("GPU backend not available, no supported devices found"));
