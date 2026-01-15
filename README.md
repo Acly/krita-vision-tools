@@ -37,7 +37,8 @@ You can find it at Filters › Other › Background Removal...
 
 ## Installation
 
-The current version of the plugin is built for [Krita 5.2.13](https://krita.org/en/download/).
+The current version of the plugin is built for Krita 5.2.13.
+[Krita 5.2.14]((https://krita.org/en/download/) is known to be compatible.
 Using it with other versions may lead to crashes.
 
 You can download the latest version of the plugin from the [releases page](https://github.com/Acly/krita-ai-tools/releases).
@@ -88,13 +89,13 @@ After GIT checkout of the Krita sources, go to the root of the Krita repository,
 and clone this repository into the plugins folder:
 ```sh
 cd krita/plugins
-git clone https://github.com/Acly/krita-ai-tools.git
+git clone --recurse-submodules https://github.com/Acly/krita-vision-tools.git
 ```
 
 Next modify the `CMakeLists.txt` in the same folder (`krita/plugins`) by
 appending the following line:
 ```cmake
-add_subdirectory( krita-ai-tools )
+add_subdirectory( krita-vision-tools )
 ```
 
 Now build and install Krita as usual according to official instructions, and the
