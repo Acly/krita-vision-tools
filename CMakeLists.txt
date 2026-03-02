@@ -52,19 +52,17 @@ file(DOWNLOAD
 # Install into python extension directory
 # * can be installed like a Python plugin for deployment
 # * can be symlinked into the user pykrita folder for development
-set(install_dir ${CMAKE_INSTALL_PREFIX}/krita-ai-tools)
+set(install_dir ${CMAKE_INSTALL_PREFIX}/krita-vision-tools)
 
-set(lib_files $<TARGET_FILE:kritavisionml>)
-foreach(tgt ${ggml_targets})
-    list(APPEND lib_files $<TARGET_FILE:${tgt}>)
-endforeach()
-              
-install(FILES ${lib_files} DESTINATION ${install_dir}/vision_tools/lib)
+install(
+  TARGETS kritavisionml visioncpp ${ggml_targets}
+  LIBRARY DESTINATION ${install_dir}/vision_tools/lib
+  RUNTIME DESTINATION ${install_dir}/vision_tools/lib
+)              
 install(DIRECTORY python/ DESTINATION ${install_dir}/vision_tools) 
 install(DIRECTORY vision.cpp/models/ DESTINATION ${install_dir}/vision_tools/models FILES_MATCHING PATTERN "*.gguf")
 install(FILES src/vision_tools.action src/vision_filters.action DESTINATION ${install_dir}/vision_tools)
 install(FILES vision_tools.desktop DESTINATION ${install_dir})
-install(FILES $<TARGET_FILE:visioncpp> DESTINATION ${install_dir}/vision_tools/lib)
 if(WIN32)
   find_file(libomp NAMES libomp.dll REQUIRED)
   install(FILES ${libomp} DESTINATION ${install_dir}/vision_tools/lib)

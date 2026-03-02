@@ -49,7 +49,7 @@ sudo modprobe vgem
 Prepare build inside docker:
 ```sh
 # build vulkan
-source ~/persistent/krita/plugins/krita-ai-tools/scripts/build-vulkan.sh
+source ~/persistent/krita/plugins/krita-vision-tools/scripts/build-vulkan.sh
 
 # configure Krita
 cd appimage-workspace/krita-build/
@@ -70,7 +70,7 @@ Build & test:
 make -j8 install
 
 # copy plugin binaries out of docker environment
-# from there they can be symlinked to ~/.local/krita/pykrita and tested with official AppImage
+# from there they can be symlinked to ~/.local/share/krita/pykrita and tested with official AppImage
 cp -R ../krita.appdir/usr/krita-vision-tools ~/persistent/
 
 # (optional) start the custom built Krita from inside docker
@@ -79,6 +79,6 @@ cp -R ../krita.appdir/usr/krita-vision-tools ~/persistent/
 
 Package outside of docker:
 ```sh
-cd $KRITA_DIR/persistent/krita-ai-tools
+cd $KRITA_DIR/persistent/krita-vision-tools
 ./../../krita/plugins/krita-vision-tools/scripts/package.sh X.Y.Z
 ```
