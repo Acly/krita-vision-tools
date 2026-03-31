@@ -37,7 +37,7 @@ git stash pop
 #   comment out related lines in scripts
 
 # run container
-./bin/run_container krita-deps krita-auto-1
+./bin/run_container krita-deps krita
 
 # if error gathering device information while adding custom device "/dev/dri": no such file or directory:
 sudo modprobe vgem
@@ -61,7 +61,10 @@ rm -r ../krita.appdir
 run_cmake.sh ~/persistent/krita
 
 # release build (use this for packages)
-cmake ~/persistent/krita -DCMAKE_INSTALL_PREFIX=$KRITADIR -DCMAKE_BUILD_TYPE=Release -DPYQT_SIP_DIR_OVERRIDE=~/appimage-workspace/deps/usr/share/sip
+# .. for Krita 5.3.x (Qt5)
+cmake ~/persistent/krita -DCMAKE_INSTALL_PREFIX=$KRITADIR -DCMAKE_BUILD_TYPE=Release
+# .. for Krita 6.x (Qt6)
+cmake ~/persistent/krita -DCMAKE_INSTALL_PREFIX=$KRITADIR -DCMAKE_BUILD_TYPE=Release -DPYQT_SIP_DIR_OVERRIDE=~/appimage-workspace/deps/usr/share/sip -DBUILD_WITH_QT6=ON
 ```
 
 Build & test:
@@ -80,5 +83,5 @@ cp -R ../krita.appdir/usr/krita-vision-tools ~/persistent/
 Package outside of docker:
 ```sh
 cd $KRITA_DIR/persistent/krita-vision-tools
-./../../krita/plugins/krita-vision-tools/scripts/package.sh X.Y.Z
+../krita/plugins/krita-vision-tools/scripts/package.sh X.Y.Z
 ```
