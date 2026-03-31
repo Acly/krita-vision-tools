@@ -62,9 +62,9 @@ run_cmake.sh ~/persistent/krita
 
 # release build (use this for packages)
 # .. for Krita 5.3.x (Qt5)
-cmake ~/persistent/krita -DCMAKE_INSTALL_PREFIX=$KRITADIR -DCMAKE_BUILD_TYPE=Release
+cmake ~/persistent/krita -DCMAKE_INSTALL_PREFIX=$KRITADIR -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=~/appimage-workspace/deps/usr/share/sip 
 # .. for Krita 6.x (Qt6)
-cmake ~/persistent/krita -DCMAKE_INSTALL_PREFIX=$KRITADIR -DCMAKE_BUILD_TYPE=Release -DPYQT_SIP_DIR_OVERRIDE=~/appimage-workspace/deps/usr/share/sip -DBUILD_WITH_QT6=ON
+cmake ~/persistent/krita -DCMAKE_INSTALL_PREFIX=$KRITADIR -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=~/appimage-workspace/deps/usr/share/sip -DBUILD_WITH_QT6=ON
 ```
 
 Build & test:
@@ -84,4 +84,25 @@ Package outside of docker:
 ```sh
 cd $KRITA_DIR/persistent/krita-vision-tools
 ../krita/plugins/krita-vision-tools/scripts/package.sh X.Y.Z
+```
+
+
+## Windows
+
+Follow https://docs.krita.org/en/untranslatable_pages/building_krita.html#building-on-windows
+
+```sh
+# configure
+cmake ../krita -DCMAKE_INSTALL_PREFIX=C:/dev/krita/_install -G Ninja -DCMAKE_BUILD_TYPE=Release
+```
+
+If there are issues with SIP project version: exclude SIP generation in `plugins/extensions/pykrita/sip/CMakeLists.txt`:
+```cmake
+# add_sip_python_module_v5(PyKrita.krita ./krita/kritamod.sip kritalibkis kritaui kritaimage kritalibbrush)
+```
+
+Package:
+```
+cd _install\krita-vision-tools
+..\..\krita\plugins\krita-vision-tools\scripts\package.ps1 X.Y.Z
 ```
