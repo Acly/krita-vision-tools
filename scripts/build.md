@@ -4,6 +4,13 @@ Most of the process is described in detail in [official Krita docs](https://docs
 
 ## Linux
 
+Follow guide or the readme at https://invent.kde.org/dkazakov/krita-docker-env
+
+For Qt6 build, make sure to use the Qt6 deps branch:
+```sh
+./bin/bootstrap-deps.sh -b transition.now/qt6
+```
+
 Prepare docker environment:
 
 ```sh
@@ -64,7 +71,7 @@ run_cmake.sh ~/persistent/krita
 # .. for Krita 5.3.x (Qt5)
 cmake ~/persistent/krita -DCMAKE_INSTALL_PREFIX=$KRITADIR -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=~/appimage-workspace/deps/usr/share/sip 
 # .. for Krita 6.x (Qt6)
-cmake ~/persistent/krita -DCMAKE_INSTALL_PREFIX=$KRITADIR -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=~/appimage-workspace/deps/usr/share/sip -DBUILD_WITH_QT6=ON
+cmake ~/persistent/krita -DCMAKE_INSTALL_PREFIX=$KRITADIR -DCMAKE_BUILD_TYPE=Release -DBUILD_WITH_QT6=ON -DALLOW_UNSTABLE=QT6
 ```
 
 Build & test:
@@ -78,6 +85,14 @@ cp -R ../krita.appdir/usr/krita-vision-tools ~/persistent/
 
 # (optional) start the custom built Krita from inside docker
 ../krita.appdir/usr/bin/krita
+```
+
+Link as user plugin outside of docker so it can be tested with official AppImage
+```sh
+cd ~/.local/share/krita/pykrita
+rm vision_tools*
+ln -s $KRITA_DIR/persistent/krita-vision-tools/vision_tools
+ln -s $KRITA_DIR/persistent/krita-vision-tools/vision_tools.desktop
 ```
 
 Package outside of docker:

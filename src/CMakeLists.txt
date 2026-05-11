@@ -9,7 +9,7 @@ set(kritavisionml_SOURCES
     ../../tools/selectiontools/kis_selection_modifier_mapper.cc
 )
 
-qt5_add_resources(kritavisionml_SOURCES ../icons/kritavisionml.qrc)
+qt_add_resources(kritavisionml_SOURCES ../icons/kritavisionml.qrc)
 
 kis_add_library(kritavisionml MODULE ${kritavisionml_SOURCES})
 
