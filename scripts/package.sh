@@ -24,6 +24,17 @@ while IFS= read -r -d '' file; do
     mv "$file" "$TMPDIR/"
 done < <(find . -type f -size +100M -print0)
 
+# Remove symlinks
+find . -type l -exec rm {} +
+
+# Rename lib/lib*.so.X.Y.Z to lib/lib*.so.X
+find . -type f -regex '.*lib/lib[^/]*\.so\.[0-9]+\.[0-9]+\.[0-9]+' -exec sh -c '
+    for file; do
+        newname=$(echo "$file" | sed -E "s/(lib\/lib[^\/]*\.so\.[0-9]+)\.[0-9]+\.[0-9]+/\1/")
+        mv "$file" "$newname"
+    done
+' sh {} +
+
 # Zip the folder contents
 zip -yr "krita_vision_tools-linux-x64-$VERSION.zip" *
 
