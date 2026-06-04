@@ -63,6 +63,7 @@ cd appimage-workspace/krita-build/
 
 # clean
 rm -r ../krita.appdir
+rm -r $KRITADIR/krita-vision-tools
 
 # debug build (for development only)
 run_cmake.sh ~/persistent/krita
@@ -106,9 +107,29 @@ cd $KRITA_DIR/persistent/krita-vision-tools
 
 Follow https://docs.krita.org/en/untranslatable_pages/building_krita.html#building-on-windows
 
+### Dependencies for Qt6
+
+After cloning `krita-deps-management`, switch it to the Qt6 branch (or do it during the clone).
+Also supply the branch name to the dependency python script.
+
 ```sh
-# configure
+cd krita-deps-management
+git checkout transition.now/qt6
+
+cd ..
+python krita-deps-management\tools\setup-env.py -b transition.now/qt6 --full-krita-env -v PythonEnv -p C:\dev\llvm-mingw\bin -p C:\dev\llvm-mingw\x86_64-w64-mingw32\bin -p C:\dev\tools
+```
+
+### Configure
+
+```sh
+cd b_krita
+
+# .. for Krita 5.3 (Qt5)
 cmake ../krita -DCMAKE_INSTALL_PREFIX=C:/dev/krita/_install -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+# .. for Krita 6 (Qt6)
+cmake ../krita -DCMAKE_INSTALL_PREFIX=C:/dev/krita/_install -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_WITH_QT6=ON -DALLOW_UNSTABLE=QT6
 ```
 
 If there are issues with SIP project version: exclude SIP generation in `plugins/extensions/pykrita/sip/CMakeLists.txt`:
@@ -116,8 +137,17 @@ If there are issues with SIP project version: exclude SIP generation in `plugins
 # add_sip_python_module_v5(PyKrita.krita ./krita/kritamod.sip kritalibkis kritaui kritaimage kritalibbrush)
 ```
 
-Package:
+### Test & Package
+
+Link:
+```ps1
+cd $ENV:APPDATA\krita\pykrita
+New-Item -Value $ENV:KRITA_DIR\_install\krita-vision-tools\vision_tools -ItemType SymbolicLink -Path vision_tools
+New-Item -Value $ENV:KRITA_DIR\_install\krita-vision-tools\vision_tools.desktop -ItemType SymbolicLink -Path vision_tools.desktop
 ```
+
+Package:
+```sh
 cd _install\krita-vision-tools
 ..\..\krita\plugins\krita-vision-tools\scripts\package.ps1 X.Y.Z
 ```

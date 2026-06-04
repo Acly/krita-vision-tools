@@ -8,12 +8,13 @@ endif()
 set(ggml_targets ggml ggml-cpu ggml-base)
 
 if(NOT APPLE)
-    set(VISP_VULKAN ON)
-    list(APPEND ggml_targets ggml-vulkan)
+  set(VISP_VULKAN ON)
+  list(APPEND ggml_targets ggml-vulkan)
 endif()
-
+if(UNIX)
+  set(VISP_FMT_LIB ON) # C++20 <format> not supported in Krita's Linux build environment
+endif()
 set(VISP_CI ON) # deployment build
-set(VISP_FMT_LIB ON) # C++20 <format> not supported in Krita's Linux build environment
 add_subdirectory(vision.cpp)
 
 foreach(tgt ${ggml_targets})
